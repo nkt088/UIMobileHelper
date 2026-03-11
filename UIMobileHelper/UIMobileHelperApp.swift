@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct UIMobileHelperApp: App {
+    @AppStorage("isFirstLaunch") var isFirstLaunch: Bool = true
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if isFirstLaunch {
+                OnboardingView(isFirstLaunch: $isFirstLaunch)
+            } else {
+                RootView()
+            }
         }
     }
 }
