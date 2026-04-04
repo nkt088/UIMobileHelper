@@ -12,14 +12,13 @@ struct RootView: View {
     var body: some View {
         TabView {
             NavigationStack {
-                PlaceholderContentView(text: "Главный экран")
-            }
+                MainView()            }
             .tabItem {
                 Image(systemName: "plus.square")
                 Text("Главная")
             }
             NavigationStack {
-                PlaceholderContentView(text: "Учебные материала")
+                StudyMaterialView()
             }
             .tabItem {
                 Image(systemName: "folder.fill")
@@ -32,7 +31,38 @@ struct RootView: View {
 #Preview {
     RootView()
 }
-
+struct MainView : View {
+    var body : some View {
+        VStack {
+            Spacer()
+            NavigationLink("Начать анкетирование") {
+                SurveyView()
+            }
+            .buttonStyle(.borderedProminent)
+            Spacer()
+        }
+        .navigationTitle("Главный экран")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+struct StudyMaterialView : View {
+    var body : some View {
+        VStack {
+            Text("Всякие материалы")
+        }
+        .navigationTitle("Учебные материалы")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+struct SurveyView : View {
+    var body : some View {
+        VStack {
+            Text ("Анкета")
+        }
+        .navigationTitle("Главная")
+    }
+    
+}
 struct PlaceholderContentView : View {
     @State var text: String = ""
     var body: some View {
