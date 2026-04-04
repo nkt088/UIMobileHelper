@@ -386,8 +386,8 @@ enum AppSubcategory: String, CaseIterable, Identifiable, Hashable {
 }
 
 struct ThemeSelection: Hashable {
-    let topic: AppTopic
-    let subcategory: AppSubcategory
+    var topic: AppTopic
+    var subcategory: AppSubcategory
 }
 //import Foundation
 //

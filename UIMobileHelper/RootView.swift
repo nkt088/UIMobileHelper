@@ -34,13 +34,13 @@ struct RootView: View {
 struct MainView : View {
     var body : some View {
         VStack {
-            Spacer()
             NavigationLink("Начать анкетирование") {
-                SurveyView()
+                SurveyFlowView()
             }
             .buttonStyle(.borderedProminent)
-            Spacer()
+            //.tint(.teal)
         }
+        .padding()
         .navigationTitle("Главный экран")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -54,19 +54,3 @@ struct StudyMaterialView : View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
-struct SurveyView : View {
-    var body : some View {
-        VStack {
-            Text ("Анкета")
-        }
-        .navigationTitle("Главная")
-    }
-    
-}
-struct PlaceholderContentView : View {
-    @State var text: String = ""
-    var body: some View {
-        Text(text)
-    }
-}
-

@@ -17,6 +17,7 @@ struct UIMobileHelperApp: App {
                 OnboardingView(isFirstLaunch: $isFirstLaunch)
             } else {
                 RootView()
+                    .tint(.teal)
             }
         }
     }

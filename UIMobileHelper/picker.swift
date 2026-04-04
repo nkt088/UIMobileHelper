@@ -57,6 +57,6 @@ struct DetailsView: View {
     }
 }
 
-#Preview {
-    ThemePickerView()
-}
+//#Preview {
+//    ThemePickerView()
+//}
