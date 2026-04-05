@@ -46,7 +46,7 @@ struct SurveyFlowView : View {
                 } label: {
                     HStack {
                         Image(systemName: "chevron.left")
-                        Text("Назад")
+                        Text("На главную")
                     }
                 }
             }

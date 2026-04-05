@@ -8,13 +8,19 @@
 import SwiftUI
 
 struct OnboardingView: View {
-    @Binding var isFirstLaunch : Bool
+    @Environment(\.dismiss) private var dismiss
+    @Binding var isFirstLaunch: Bool
+    var isPresentedModally: Bool = false
+
     var body: some View {
         VStack {
             Text("Добро пожаловать!")
                 .font(.largeTitle)
             Button("Пропустить") {
                 isFirstLaunch = false
+                if isPresentedModally {
+                    dismiss()
+                }
             }
         }
     }
