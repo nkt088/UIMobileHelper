@@ -6,25 +6,6 @@
 //
 //
 
-/*
- Object : protocol {
- //protocol будет содержать те же поля что и категория, его также будет поддеживать и объект категории
- //поля:
- операционная система
- шрифт :
- цвет заднего фона :
- цвет шрифта :
- акцентный цвет :
- количество экранов // макс 3
- [название экрана, комментарий к экрану]
- [название экрана, комментарий к экрану]
- [название экрана, комментарий к экрану]
- список рекомендованной литературы :
- комментарий к приложению // типо напуствие
-
- //там где двоеточие это поля из страктуры категории
- }
- */
 import SwiftUI
 
 struct CategoryContent: Hashable, Codable {
@@ -627,8 +608,6 @@ struct ThemeSelection: Hashable, Codable {
     var topic: AppTopic
     var subcategory: AppSubcategory
 }
-//import Foundation
-//
 //Продукты — доставка еды, магазины, кафе, рестораны
 //Финансы — банки, брокеры, трейдинг, криптовалюта
 //Коммуникации — мессенджеры, соцсети, почта
@@ -641,115 +620,3 @@ struct ThemeSelection: Hashable, Codable {
 //Работа и бизнес — CRM, таск-менеджеры, учёт, документооборот
 //Утилиты — заметки, погода, календарь, менеджеры файлов
 //Недвижимость — аренда и покупка жилья
-//
-//enum AppTopic: String, CaseIterable, Identifiable {
-//    case groceries
-//    case finance
-//    case communication
-//    case entertainment
-//    case education
-//    case transport
-//    case health
-//    case shopping
-//    case travel
-//    case workBusiness
-//    case utilities
-//    case realEstate
-//    
-//    var id: Self { self }
-//    
-//    var title: String {
-//        switch self {
-//        case .groceries: "Продукты"
-//        case .finance: "Финансы"
-//        case .communication: "Коммуникации"
-//        case .entertainment: "Развлечения"
-//        case .education: "Образование"
-//        case .transport: "Транспорт"
-//        case .health: "Здоровье"
-//        case .shopping: "Покупки"
-//        case .travel: "Путешествия"
-//        case .workBusiness: "Работа и бизнес"
-//        case .utilities: "Утилиты"
-//        case .realEstate: "Недвижимость"
-//        }
-//    }
-//    var categories: [String] {
-//        switch self {
-//        case .groceries:
-//            [.foodDelivery, .cafes, .restaurants]
-//            
-//        case .finance:
-//            ["Banks", "Brokers", "Trading", "Cryptocurrency"]
-//            
-//        case .communication:
-//            ["Messengers", "Social Networks", "Email"]
-//        default : []
-//        }
-//    }
-//    struct Category: Identifiable {
-//        let id = UUID()
-//        let title: String
-//        let description: String
-//        let fontName: String
-//    }
-//    
-//    extension Category {
-//        static let foodDelivery = Category(
-//            title: "Food Delivery",
-//            description: "Apps for ordering and delivering food from restaurants and cafes",
-//            fontName: "SF Pro",
-//        )
-//        static let cafes = Category(
-//            title: "cafes",
-//            description: "Apps for ordering and delivering food from restaurants and cafes",
-//            fontName: "SF Pro",
-//        )
-//        static let restaurants = Category(
-//            title: "Restaurants",
-//            description: "Apps for ordering and delivering food from restaurants and cafes",
-//            fontName: "SF Pro",
-//        )
-//    }
-//    
-//    
-//    struct FoodDelivery {
-//        let title : String = "Доставка"
-//    }
-//    //Groceries — food delivery, shops, cafés, restaurants
-//    //Finance — banks, brokers, trading, cryptocurrency
-//    //Communication — messengers, social networks, email
-//    //Entertainment — music player, video hosting, streaming, games
-//    //Education — courses, languages, lectures, training apps
-//    //Transport — taxi, car sharing, tickets, navigation
-//    //Health — fitness, medicine, health tracking
-//    //Shopping — marketplaces, stores, discounts
-//    //Travel — accommodation booking, tickets, maps
-//    //Work and Business — CRM, task managers, accounting, document management
-//    //Utilities — notes, weather, calendar, file managers
-//    //Real Estate — housing rental and purchase
-//    
-//    
-//    enum MyEnum {
-//        typealias Item = (title: String, value: String)
-//        
-//        case first
-//        case second
-//        case third
-//        
-//        var value: [Item] {
-//            switch self {
-//            case .first:
-//                [("1", "one"), ("2", "two"), ("3", "three")]
-//            case .second:
-//                [("a", "alpha"), ("b", "beta")]
-//            case .third:
-//                [("x", "first"), ("y", "second"), ("z", "third")]
-//            }
-//        }
-//    }
-//    
-//    
-//    
-//    можно оставить и первую реализацию, можно попробовать сделать протоколо под каждую категорию тогда можно будет создать массив,
-//    и добавить туда структуры под каждую подкатегорию

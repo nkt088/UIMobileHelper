@@ -98,10 +98,6 @@ struct SurveyFlowView : View {
                 answers: answers,
                 generatedMockups: generatedMockups
             )
-//            case .imageGeneration :
-//            ImageGenerationView()
-//            case .summary :
-//            SummaryView(answers: answers)
         }
     }
     private var transition: AnyTransition {
@@ -110,13 +106,7 @@ struct SurveyFlowView : View {
             removal: .move(edge: isForward ? .leading : .trailing).combined(with: .opacity)
         )
     }
-//    private func goNext () {
-//        guard let next = SurveyStep(rawValue: step.rawValue + 1) else { return }
-//        isForward = true
-//        withAnimation(.easeInOut) {
-//            step = next
-//        }
-//    }
+
     private func goNext() {
         if step == .screens {
             generationFailed = false
@@ -332,138 +322,7 @@ struct ScreenQuestView: View {
         customScreenComment = ""
     }
 }
-//struct SummaryView: View {
-//    @Environment(\.dismiss) private var dismiss
-//    var answers: SurveyAnswers
-//
-//    var body: some View {
-//        ScrollView {
-//            VStack(alignment: .leading, spacing: 20) {
-//                headerSection
-//                appInfoSection
-//                designSection
-//                screensSection
-//            }
-//            .padding()
-//        }
-//        .navigationTitle("Результат")
-//        .navigationBarTitleDisplayMode(.inline)
-//        .toolbar {
-//            ToolbarItem(placement: .topBarTrailing) {
-//                Button("Завершить") {
-//                    dismiss()
-//                }
-//            }
-//        }
-//    }
-//
-//    private var headerSection: some View {
-//        VStack(alignment: .leading, spacing: 8) {
-//            Text("Итог анкеты")
-//                .font(.largeTitle.bold())
-//
-//            Text("Ниже собраны все выбранные параметры и рекомендации по интерфейсу.")
-//                .foregroundStyle(.secondary)
-//        }
-//        .frame(maxWidth: .infinity, alignment: .leading)
-//    }
-//
-//    private var appInfoSection: some View {
-//        infoCard(title: "Общая информация") {
-//            infoRow(title: "ОС", value: answers.OS)
-//            infoRow(title: "Тема", value: answers.themeSelection.topic.title)
-//            infoRow(title: "Подтема", value: answers.themeSelection.subcategory.content.title)
-//            infoRow(title: "Описание", value: answers.themeSelection.subcategory.content.description)
-//        }
-//    }
-//
-//    private var designSection: some View {
-//        infoCard(title: "Рекомендации по интерфейсу") {
-//            infoRow(title: "Шрифт", value: answers.themeSelection.subcategory.content.fontName)
-//            infoRow(title: "Цвет шрифта", value: answers.themeSelection.subcategory.content.fontColor)
-//            infoRow(title: "Цвет фона", value: answers.themeSelection.subcategory.content.backgroundColor)
-//            infoRow(title: "Вторичный цвет", value: answers.themeSelection.subcategory.content.secondaryColor)
-//            infoRow(title: "Акцентный цвет", value: answers.themeSelection.subcategory.content.accentColor)
-//
-//            VStack(alignment: .leading, spacing: 8) {
-//                Text("Рекомендуемые экраны")
-//                    .font(.headline)
-//
-//                ForEach(answers.themeSelection.subcategory.content.screens, id: \.self) { screen in
-//                    HStack(alignment: .top, spacing: 8) {
-//                        Image(systemName: "circle.fill")
-//                            .font(.system(size: 6))
-//                            .padding(.top, 6)
-//                            .foregroundStyle(.secondary)
-//
-//                        Text(screen)
-//                            .frame(maxWidth: .infinity, alignment: .leading)
-//                    }
-//                }
-//            }
-//            .padding(.top, 4)
-//        }
-//    }
-//
-//    private var screensSection: some View {
-//        infoCard(title: "Выбранные пользователем экраны") {
-//            if answers.screens.isEmpty {
-//                Text("Пользователь не выбрал дополнительные экраны.")
-//                    .foregroundStyle(.secondary)
-//            } else {
-//                ForEach(answers.screens, id: \.title) { screen in
-//                    VStack(alignment: .leading, spacing: 6) {
-//                        Text(screen.title)
-//                            .font(.headline)
-//
-//                        if screen.comment.isEmpty {
-//                            Text("Комментарий не указан")
-//                                .foregroundStyle(.secondary)
-//                        } else {
-//                            Text(screen.comment)
-//                                .foregroundStyle(.secondary)
-//                        }
-//                    }
-//                    .frame(maxWidth: .infinity, alignment: .leading)
-//                    .padding()
-//                    .background(Color(uiColor: .tertiarySystemBackground))
-//                    .clipShape(RoundedRectangle(cornerRadius: 14))
-//
-//                    if screen.title != answers.screens.last?.title {
-//                        Divider()
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    private func infoCard<Content: View>(
-//        title: String,
-//        @ViewBuilder content: () -> Content
-//    ) -> some View {
-//        VStack(alignment: .leading, spacing: 14) {
-//            Text(title)
-//                .font(.title3.bold())
-//
-//            content()
-//        }
-//        .padding()
-//        .frame(maxWidth: .infinity, alignment: .leading)
-//        .background(Color(uiColor: .secondarySystemBackground))
-//        .clipShape(RoundedRectangle(cornerRadius: 20))
-//    }
-//
-//    private func infoRow(title: String, value: String) -> some View {
-//        VStack(alignment: .leading, spacing: 4) {
-//            Text(title)
-//                .font(.subheadline.weight(.semibold))
-//                .foregroundStyle(.secondary)
-//
-//            Text(value)
-//                .frame(maxWidth: .infinity, alignment: .leading)
-//        }
-//    }
-//}
+
 struct SummaryView: View {
     @Environment(\.dismiss) private var dismiss
     var answers: SurveyAnswers
@@ -687,46 +546,3 @@ struct MockupImageView: View {
         }
     }
 }
-
-//struct SummaryView : View {
-//    @Environment(\.dismiss) private var dismiss
-//    var answers : SurveyAnswers
-//    var body: some View {
-//        VStack {
-//            Text("Результат")
-//                .font(.title)
-//            Divider()
-//            VStack {
-//                Text(answers.themeSelection.topic.title)
-//                Text(answers.themeSelection.subcategory.content.title)
-//                Text(answers.themeSelection.subcategory.content.description)
-//                Text(answers.themeSelection.subcategory.content.fontName)
-//                    .font(.title2)
-//                Text(answers.OS)
-//                    .font(.title2)
-//                ForEach(answers.screens, id: \.title) { screen in
-//                    Text(screen.title)
-//                    Text(screen.comment)
-//                }
-//            }
-//            .padding()
-//        }
-//        .padding()
-//
-//        .toolbar {
-//            ToolbarItem(placement: .principal){
-//                Text("Результат")
-//            }
-//            ToolbarItem(placement: .topBarTrailing) {
-//                Button{
-//                    dismiss()
-//                } label: {
-//                    HStack {
-//                        Text("Завершить")
-//                        Image(systemName: "chevron.right")
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}

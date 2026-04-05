@@ -48,15 +48,3 @@ struct LiteratureItem: Hashable, Identifiable, Codable{
     let link: String
     let comment: String
 }
-//enum Screen : String, CaseIterable, Identifiable, Hashable {
-//    case :
-//}
-//var fontName: String = "SF Pro"
-
-//var backgroundColor: String = "Белый"
-//var textColor: String  = "Черный"
-//var accentColor: String = "Синий"
-
-//var RecommendedLiterature: [LiteratureItem] = []
-
-//var appComment: String = "Комментарий пока не сформирован"

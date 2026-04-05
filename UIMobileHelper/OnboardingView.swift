@@ -26,8 +26,3 @@ struct OnboardingPage {
     let subtitle : String
     let imageTitle : String
 }
-
-//#Preview {
-//    @Previewable @State var isFirstLaunch = true
-//    OnboardingView(isFirstLaunch: $isFirstLaunch)
-//}

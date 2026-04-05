@@ -28,24 +28,6 @@ struct RootView: View {
     }
 }
 
-#Preview {
-    RootView()
-}
-//struct MainView : View {
-//    var body : some View {
-//        VStack {
-//            NavigationLink("Начать анкетирование") {
-//                SurveyFlowView()
-//            }
-//            .buttonStyle(.borderedProminent)
-//            //.tint(.teal)
-//        }
-//        .padding()
-//        .navigationTitle("Главный экран")
-//        .navigationBarTitleDisplayMode(.inline)
-//    }
-//}
-
 struct MainView: View {
     @State private var previousResults: [PreviousSurveyAnswers] = []
 
@@ -97,4 +79,8 @@ struct StudyMaterialView : View {
         .navigationTitle("Учебные материалы")
         .navigationBarTitleDisplayMode(.inline)
     }
+}
+
+#Preview {
+    RootView()
 }
