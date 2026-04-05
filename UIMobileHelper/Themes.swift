@@ -27,7 +27,7 @@
  */
 import SwiftUI
 
-struct CategoryContent: Hashable {
+struct CategoryContent: Hashable, Codable {
     let title: String
     let description: String
     let fontName: String
@@ -38,7 +38,7 @@ struct CategoryContent: Hashable {
     let screens: [String]
 }
 
-enum AppTopic: String, CaseIterable, Identifiable {
+enum AppTopic: String, CaseIterable, Identifiable, Codable{
     case groceries
     case finance
     case communication
@@ -76,7 +76,7 @@ enum AppTopic: String, CaseIterable, Identifiable {
     }
 }
 
-enum AppSubcategory: String, CaseIterable, Identifiable, Hashable {
+enum AppSubcategory: String, CaseIterable, Identifiable, Hashable, Codable {
     case foodDelivery
     case shops
     case cafes
@@ -623,7 +623,7 @@ enum AppSubcategory: String, CaseIterable, Identifiable, Hashable {
     var title: String { content.title }
 }
 
-struct ThemeSelection: Hashable {
+struct ThemeSelection: Hashable, Codable {
     var topic: AppTopic
     var subcategory: AppSubcategory
 }

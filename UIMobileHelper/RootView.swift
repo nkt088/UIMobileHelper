@@ -31,18 +31,62 @@ struct RootView: View {
 #Preview {
     RootView()
 }
-struct MainView : View {
-    var body : some View {
-        VStack {
+//struct MainView : View {
+//    var body : some View {
+//        VStack {
+//            NavigationLink("Начать анкетирование") {
+//                SurveyFlowView()
+//            }
+//            .buttonStyle(.borderedProminent)
+//            //.tint(.teal)
+//        }
+//        .padding()
+//        .navigationTitle("Главный экран")
+//        .navigationBarTitleDisplayMode(.inline)
+//    }
+//}
+
+struct MainView: View {
+    @State private var previousResults: [PreviousSurveyAnswers] = []
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
             NavigationLink("Начать анкетирование") {
                 SurveyFlowView()
             }
             .buttonStyle(.borderedProminent)
-            //.tint(.teal)
+            Text("Результаты прошлых прохождений")
+                .font(.title2.bold())
+            if previousResults.isEmpty {
+                Text("Сохранённых результатов пока нет.")
+                    .foregroundStyle(.secondary)
+            } else {
+                List(previousResults, id: \.date) { item in
+                    NavigationLink {
+                        SummaryView(
+                            answers: item.answers,
+                            generatedMockups: PreviousSurveyAnswersStore.shared.mockups(from: item)
+                        )
+                    } label: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("\(item.answers.themeSelection.topic.title) / \(item.answers.themeSelection.subcategory.content.title)")
+                                .font(.headline)
+                            Text(item.date.formatted(date: .abbreviated, time: .shortened))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .listStyle(.plain)
+            }
+            Spacer()
         }
         .padding()
         .navigationTitle("Главный экран")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            previousResults = PreviousSurveyAnswersStore.shared.loadAll()
+        }
     }
 }
 struct StudyMaterialView : View {

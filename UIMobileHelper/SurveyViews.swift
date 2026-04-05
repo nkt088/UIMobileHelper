@@ -77,8 +77,16 @@ struct SurveyFlowView : View {
                 onCompleted: { mockups in
                     generatedMockups = mockups
                     generationFailed = false
-                    withAnimation(.easeInOut) {
-                        step = .summary
+                    Task {
+                        try? await PreviousSurveyAnswersStore.shared.save(
+                            answers: answers,
+                            mockups: mockups
+                        )
+                        await MainActor.run {
+                            withAnimation(.easeInOut) {
+                                step = .summary
+                            }
+                        }
                     }
                 },
                 onFailed: {
@@ -578,35 +586,7 @@ struct SummaryView: View {
                             Text(mockup.screenComment)
                                 .foregroundStyle(.secondary)
                         }
-
-                        AsyncImage(url: mockup.imageURL) { phase in
-                            switch phase {
-                            case .empty:
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .fill(.thinMaterial)
-                                    ProgressView()
-                                }
-                                .frame(height: 280)
-
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .clipShape(RoundedRectangle(cornerRadius: 20))
-
-                            case .failure:
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .fill(.thinMaterial)
-                                    Text("Не удалось загрузить изображение")
-                                }
-                                .frame(height: 280)
-
-                            @unknown default:
-                                EmptyView()
-                            }
-                        }
+                        MockupImageView(url: mockup.imageURL)
                     }
 
                     if mockup.screenTitle != generatedMockups.last?.screenTitle {
@@ -663,6 +643,48 @@ extension SurveyAnswers {
         return """
         Необходимо сгенерировать макет экрана: \(screen.title). Наполнение экрана должно соответствовать следующему описанию: \(screen.comment).
         """
+    }
+}
+//для summaryview
+struct MockupImageView: View {
+    let url: URL
+
+    var body: some View {
+        if url.isFileURL, let uiImage = UIImage(contentsOfFile: url.path) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFit()
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+        } else {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .empty:
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(.thinMaterial)
+                        ProgressView()
+                    }
+                    .frame(height: 280)
+
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+
+                case .failure:
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(.thinMaterial)
+                        Text("Не удалось загрузить изображение")
+                    }
+                    .frame(height: 280)
+
+                @unknown default:
+                    EmptyView()
+                }
+            }
+        }
     }
 }
 

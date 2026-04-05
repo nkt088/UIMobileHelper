@@ -24,17 +24,25 @@ enum SurveyStep : Int, CaseIterable {
         }
     }
 }
-struct Screen: Hashable {
+struct Screen: Hashable, Codable {
     var title: String = ""
     var comment: String = ""
 }
-struct SurveyAnswers: Hashable {
+
+struct SurveyAnswers: Hashable, Codable {
     var themeSelection = ThemeSelection(topic: .groceries, subcategory: .foodDelivery)
-    var OS : String = "iOS"
+    var OS: String = "iOS"
     var BaseRecommendedLiterature: [LiteratureItem] = []
     var screens: [Screen] = []
 }
-struct LiteratureItem: Hashable, Identifiable {
+
+struct PreviousSurveyAnswers: Hashable, Codable, Identifiable {
+    var id = UUID()
+    var answers: SurveyAnswers
+    var imagePath: [String]
+    var date: Date = Date()
+}
+struct LiteratureItem: Hashable, Identifiable, Codable{
     let id = UUID()
     let title: String
     let link: String

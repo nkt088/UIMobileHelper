@@ -13,7 +13,7 @@ final class ImageGeneratorVM: ObservableObject {
     @Published var errorMessage: String?
     @Published var progressText = ""
     
-    private let apiKey = "API_KEY"
+    private let apiKey = "API-KEY"
     private let createURL = URL(string: "https://gptunnel.ru/v1/media/create")!
     private let resultURL = URL(string: "https://gptunnel.ru/v1/media/result")!
 
