@@ -37,18 +37,18 @@ enum AppTopic: String, CaseIterable, Identifiable, Codable{
 
     var title: String {
         switch self {
-        case .groceries: "Groceries"
-        case .finance: "Finance"
-        case .communication: "Communication"
-        case .entertainment: "Entertainment"
-        case .education: "Education"
-        case .transport: "Transport"
-        case .health: "Health"
-        case .shopping: "Shopping"
-        case .travel: "Travel"
-        case .workAndBusiness: "Work and Business"
-        case .utilities: "Utilities"
-        case .realEstate: "Real Estate"
+        case .groceries: "Продукты"
+        case .finance: "Финансы"
+        case .communication: "Коммуникации"
+        case .entertainment: "Развлечения"
+        case .education: "Образование"
+        case .transport: "Транспорт"
+        case .health: "Здоровье"
+        case .shopping: "Покупки"
+        case .travel: "Путешествия"
+        case .workAndBusiness: "Бизнес"
+        case .utilities: "Утилиты"
+        case .realEstate: "Недвижимость"
         }
     }
 
@@ -112,20 +112,20 @@ enum AppSubcategory: String, CaseIterable, Identifiable, Hashable, Codable {
             .entertainment
         case .courses, .languages, .lectures, .trainers:
             .education
-        case .taxi, .carSharing, .tickets, .navigation:
+        case .taxi, .carSharing, .navigation:
             .transport
         case .fitness, .medicine, .conditionTracking:
             .health
         case .marketplaces, .discounts:
             .shopping
-        case .accommodationBooking, .maps:
+        case .accommodationBooking, .maps, .tickets:
             .travel
         case .crm, .taskManagers, .accounting, .documentFlow:
             .workAndBusiness
         case .notes, .weather, .calendar, .fileManagers:
             .utilities
         case .rentAndBuyHousing:
-            .realEstate
+                .realEstate
         }
     }
 
@@ -145,7 +145,7 @@ enum AppSubcategory: String, CaseIterable, Identifiable, Hashable, Codable {
 
         case .shops:
             .init(
-                title: "Магазины",
+                title: "Супермаркеты",
                 description: "Приложение для просмотра ассортимента, акций и оформления покупок в розничных магазинах.",
                 fontName: "SF Pro Display",
                 fontColor: "#1E1E1E",
@@ -383,18 +383,6 @@ enum AppSubcategory: String, CaseIterable, Identifiable, Hashable, Codable {
                 screens: ["Карта автомобилей", "Карточка авто", "Аренда"]
             )
 
-        case .tickets:
-            .init(
-                title: "Билеты",
-                description: "Сервис для поиска, покупки и хранения билетов на транспорт и мероприятия.",
-                fontName: "Roboto",
-                fontColor: "#1F2937",
-                backgroundColor: "#F9FAFB",
-                secondaryColor: "#E0E7FF",
-                accentColor: "#4F46E5",
-                screens: ["Поиск билетов", "Результаты", "Электронный билет"]
-            )
-
         case .navigation:
             .init(
                 title: "Навигация",
@@ -489,6 +477,17 @@ enum AppSubcategory: String, CaseIterable, Identifiable, Hashable, Codable {
                 secondaryColor: "#DCFCE7",
                 accentColor: "#16A34A",
                 screens: ["Карта", "Карточка места", "Поиск"]
+            )
+        case .tickets:
+            .init(
+                title: "Билеты",
+                description: "Сервис для поиска, покупки и хранения билетов на транспорт и мероприятия.",
+                fontName: "Roboto",
+                fontColor: "#1F2937",
+                backgroundColor: "#F9FAFB",
+                secondaryColor: "#E0E7FF",
+                accentColor: "#4F46E5",
+                screens: ["Поиск билетов", "Результаты", "Электронный билет"]
             )
 
         case .crm:

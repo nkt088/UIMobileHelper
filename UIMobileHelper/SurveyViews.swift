@@ -203,6 +203,8 @@ struct ScreenQuestView: View {
     @State private var customScreenTitle = ""
     @State private var customScreenComment = ""
 
+    @FocusState private var isFocused: Bool
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Выберите экраны")
@@ -212,6 +214,7 @@ struct ScreenQuestView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Button {
                         toggleScreen(screen)
+                        isFocused = false
                     } label: {
                         HStack {
                             Image(systemName: isSelected(screen) ? "checkmark.square.fill" : "square")
@@ -226,6 +229,7 @@ struct ScreenQuestView: View {
                             "Комментарий к экрану",
                             text: commentBinding(for: screen)
                         )
+                        .focused($isFocused)
                         .padding()
                         .overlay {
                             RoundedRectangle(cornerRadius: 12)
@@ -243,6 +247,7 @@ struct ScreenQuestView: View {
                     .font(.headline)
 
                 TextField("Название экрана", text: $customScreenTitle)
+                    .focused($isFocused)
                     .padding()
                     .overlay {
                         RoundedRectangle(cornerRadius: 12)
@@ -250,6 +255,7 @@ struct ScreenQuestView: View {
                     }
 
                 TextField("Комментарий к экрану", text: $customScreenComment)
+                    .focused($isFocused)
                     .padding()
                     .overlay {
                         RoundedRectangle(cornerRadius: 12)
@@ -257,6 +263,7 @@ struct ScreenQuestView: View {
                     }
 
                 Button("Добавить экран") {
+                    isFocused = false
                     addCustomScreen()
                 }
                 .disabled(customScreenTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -268,6 +275,10 @@ struct ScreenQuestView: View {
             Spacer()
         }
         .padding()
+        .contentShape(Rectangle())
+        .onTapGesture {
+            isFocused = false
+        }
     }
 
     private func indexOfScreen(_ screen: Screen) -> Int? {
