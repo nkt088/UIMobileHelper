@@ -130,15 +130,6 @@ struct MainView: View {
         }
     }
 }
-struct StudyMaterialView : View {
-    var body : some View {
-        VStack {
-            Text("Всякие материалы")
-        }
-        .navigationTitle("Учебные материалы")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
 
 #Preview {
     RootView()
