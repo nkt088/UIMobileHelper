@@ -26,15 +26,35 @@ struct SurveyFlowView : View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             if step != .summary && (step != .imageGeneration || generationFailed) {
                 Divider()
-                HStack {
-                    Spacer()
-                    Button("Назад") { goBack() }
-                        .disabled(isFirstStep)
-                    Spacer()
-                    Button("Вперед") { goNext() }
-                        .disabled(isLastStep )
-                    Spacer()
+                HStack(spacing: 12) {
+                    Button {
+                        goBack()
+                    } label: {
+                        Text("Назад")
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 44)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.gray.opacity(0.15))
+                            )
+                    }
+                    .disabled(isFirstStep)
+                    Button {
+                        goNext()
+                    } label: {
+                        Text("Вперед")
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 44)
+                            .foregroundStyle(.white)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(.teal)
+                            )
+                    }
+                    .disabled(isLastStep)
                 }
+                .padding(.horizontal)
+                .padding(.vertical, 16)
             }
         }
         .toolbar(.hidden, for: .tabBar)
@@ -140,20 +160,30 @@ struct OSQuestView : View {
     @Binding var OS : String
     
     var body: some View {
-        VStack {
-            Text("Введите OS")
-                .font(.title)
+        VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Выберите платформу")
+                    .font(.largeTitle.bold())
+
+                Text("От этого зависят рекомендации по интерфейсу и структуре экранов.")
+                    .foregroundStyle(.secondary)
+            }
             HStack(spacing: 16) {
                 card(title: "iOS", isSelected: OS == "iOS")
                     .onTapGesture { if OS == "" || OS == "Android" {OS = "iOS"} else {OS = ""}}
                 card(title: "Android", isSelected: OS == "Android")
                     .onTapGesture { if OS == "" || OS == "iOS" {OS = "Android"} else {OS = ""}}
             }
+            Spacer()
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
     private func card(title: String, isSelected: Bool) -> some View {
-        Text(title)
+        VStack(spacing: 12) {
+            Text(title)
+                .font(.title2.bold())
+        }
             .frame(maxWidth: .infinity, minHeight: 120)
             .background(Color(uiColor: .secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -175,25 +205,52 @@ struct ThemeQuestView: View {
     @Binding var subcategory: AppSubcategory
 
     var body: some View {
-        VStack {
-            Text("Выберите тему приложения")
-                .font(.title)
-            Picker("Topic", selection: $topic) {
-                ForEach(AppTopic.allCases) {
-                    Text($0.title).tag($0)
+        VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Выберите тему приложения")
+                    .font(.largeTitle.bold())
+                
+                Text("Сначала выберите основное направление, затем уточните категорию.")
+                    .foregroundStyle(.secondary)
+            }
+            
+            VStack(alignment: .center, spacing: 12) {
+                Text("Тема")
+                    .font(.headline)
+                
+                Picker("Тема", selection: $topic) {
+                    ForEach(AppTopic.allCases) {
+                        Text($0.title).tag($0)
+                    }
+                }
+                .pickerStyle(.menu)
+                .onChange(of: topic) { _, newValue in
+                    subcategory = newValue.subcategories[0]
                 }
             }
-            .onChange(of: topic) { _, newValue in
-                subcategory = newValue.subcategories[0]
-            }
-
-            Picker("Category", selection: $subcategory) {
-                ForEach(topic.subcategories) {
-                    Text($0.title).tag($0)
+            .padding()
+            .background(Color(uiColor: .secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            
+            VStack(alignment: .center, spacing: 12) {
+                Text("Категория")
+                    .font(.headline)
+                
+                Picker("Категория", selection: $subcategory) {
+                    ForEach(topic.subcategories) {
+                        Text($0.title).tag($0)
+                    }
                 }
+                .pickerStyle(.menu)
             }
+            .padding()
+            .background(Color(uiColor: .secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            
+            Spacer()
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 
@@ -354,7 +411,7 @@ struct SummaryView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Завершить") {
+                Button("Сохранить") {
                     dismiss()
                 }
             }
