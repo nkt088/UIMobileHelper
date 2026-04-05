@@ -13,6 +13,8 @@ struct SurveyFlowView : View {
     @State private var answers = SurveyAnswers()
     @State private var showExitAlert = false
     @State private var isForward = true
+    @State private var generatedMockups: [GeneratedMockup] = []
+    @State private var generationFailed = false
 
     var body : some View {
         VStack() {
@@ -22,15 +24,17 @@ struct SurveyFlowView : View {
                     .transition(transition)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            Divider()
-            HStack {
-                Spacer()
-                Button("Назад") { goBack() }
-                    .disabled(isFirstStep)
-                Spacer()
-                Button("Вперед") { goNext() }
-                    .disabled(isLastStep )
-                Spacer()
+            if step != .summary && (step != .imageGeneration || generationFailed) {
+                Divider()
+                HStack {
+                    Spacer()
+                    Button("Назад") { goBack() }
+                        .disabled(isFirstStep)
+                    Spacer()
+                    Button("Вперед") { goNext() }
+                        .disabled(isLastStep )
+                    Spacer()
+                }
             }
         }
         .toolbar(.hidden, for: .tabBar)
@@ -68,10 +72,28 @@ struct SurveyFlowView : View {
                 },
                 screens: $answers.screens
             )
-            case .imageGeneration :
-            ImageGenerationView()
-            case .summary :
-            SummaryView(answers: answers)
+        case .imageGeneration:
+            ImageGenerationView(answers: answers,
+                onCompleted: { mockups in
+                    generatedMockups = mockups
+                    generationFailed = false
+                    withAnimation(.easeInOut) {
+                        step = .summary
+                    }
+                },
+                onFailed: {
+                    generationFailed = true
+                }
+            )
+        case .summary:
+            SummaryView(
+                answers: answers,
+                generatedMockups: generatedMockups
+            )
+//            case .imageGeneration :
+//            ImageGenerationView()
+//            case .summary :
+//            SummaryView(answers: answers)
         }
     }
     private var transition: AnyTransition {
@@ -80,7 +102,22 @@ struct SurveyFlowView : View {
             removal: .move(edge: isForward ? .leading : .trailing).combined(with: .opacity)
         )
     }
-    private func goNext () {
+//    private func goNext () {
+//        guard let next = SurveyStep(rawValue: step.rawValue + 1) else { return }
+//        isForward = true
+//        withAnimation(.easeInOut) {
+//            step = next
+//        }
+//    }
+    private func goNext() {
+        if step == .screens {
+            generationFailed = false
+            isForward = true
+            withAnimation(.easeInOut) {
+                step = answers.screens.isEmpty ? .summary : .imageGeneration
+            }
+            return
+        }
         guard let next = SurveyStep(rawValue: step.rawValue + 1) else { return }
         isForward = true
         withAnimation(.easeInOut) {
@@ -287,9 +324,142 @@ struct ScreenQuestView: View {
         customScreenComment = ""
     }
 }
+//struct SummaryView: View {
+//    @Environment(\.dismiss) private var dismiss
+//    var answers: SurveyAnswers
+//
+//    var body: some View {
+//        ScrollView {
+//            VStack(alignment: .leading, spacing: 20) {
+//                headerSection
+//                appInfoSection
+//                designSection
+//                screensSection
+//            }
+//            .padding()
+//        }
+//        .navigationTitle("Результат")
+//        .navigationBarTitleDisplayMode(.inline)
+//        .toolbar {
+//            ToolbarItem(placement: .topBarTrailing) {
+//                Button("Завершить") {
+//                    dismiss()
+//                }
+//            }
+//        }
+//    }
+//
+//    private var headerSection: some View {
+//        VStack(alignment: .leading, spacing: 8) {
+//            Text("Итог анкеты")
+//                .font(.largeTitle.bold())
+//
+//            Text("Ниже собраны все выбранные параметры и рекомендации по интерфейсу.")
+//                .foregroundStyle(.secondary)
+//        }
+//        .frame(maxWidth: .infinity, alignment: .leading)
+//    }
+//
+//    private var appInfoSection: some View {
+//        infoCard(title: "Общая информация") {
+//            infoRow(title: "ОС", value: answers.OS)
+//            infoRow(title: "Тема", value: answers.themeSelection.topic.title)
+//            infoRow(title: "Подтема", value: answers.themeSelection.subcategory.content.title)
+//            infoRow(title: "Описание", value: answers.themeSelection.subcategory.content.description)
+//        }
+//    }
+//
+//    private var designSection: some View {
+//        infoCard(title: "Рекомендации по интерфейсу") {
+//            infoRow(title: "Шрифт", value: answers.themeSelection.subcategory.content.fontName)
+//            infoRow(title: "Цвет шрифта", value: answers.themeSelection.subcategory.content.fontColor)
+//            infoRow(title: "Цвет фона", value: answers.themeSelection.subcategory.content.backgroundColor)
+//            infoRow(title: "Вторичный цвет", value: answers.themeSelection.subcategory.content.secondaryColor)
+//            infoRow(title: "Акцентный цвет", value: answers.themeSelection.subcategory.content.accentColor)
+//
+//            VStack(alignment: .leading, spacing: 8) {
+//                Text("Рекомендуемые экраны")
+//                    .font(.headline)
+//
+//                ForEach(answers.themeSelection.subcategory.content.screens, id: \.self) { screen in
+//                    HStack(alignment: .top, spacing: 8) {
+//                        Image(systemName: "circle.fill")
+//                            .font(.system(size: 6))
+//                            .padding(.top, 6)
+//                            .foregroundStyle(.secondary)
+//
+//                        Text(screen)
+//                            .frame(maxWidth: .infinity, alignment: .leading)
+//                    }
+//                }
+//            }
+//            .padding(.top, 4)
+//        }
+//    }
+//
+//    private var screensSection: some View {
+//        infoCard(title: "Выбранные пользователем экраны") {
+//            if answers.screens.isEmpty {
+//                Text("Пользователь не выбрал дополнительные экраны.")
+//                    .foregroundStyle(.secondary)
+//            } else {
+//                ForEach(answers.screens, id: \.title) { screen in
+//                    VStack(alignment: .leading, spacing: 6) {
+//                        Text(screen.title)
+//                            .font(.headline)
+//
+//                        if screen.comment.isEmpty {
+//                            Text("Комментарий не указан")
+//                                .foregroundStyle(.secondary)
+//                        } else {
+//                            Text(screen.comment)
+//                                .foregroundStyle(.secondary)
+//                        }
+//                    }
+//                    .frame(maxWidth: .infinity, alignment: .leading)
+//                    .padding()
+//                    .background(Color(uiColor: .tertiarySystemBackground))
+//                    .clipShape(RoundedRectangle(cornerRadius: 14))
+//
+//                    if screen.title != answers.screens.last?.title {
+//                        Divider()
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private func infoCard<Content: View>(
+//        title: String,
+//        @ViewBuilder content: () -> Content
+//    ) -> some View {
+//        VStack(alignment: .leading, spacing: 14) {
+//            Text(title)
+//                .font(.title3.bold())
+//
+//            content()
+//        }
+//        .padding()
+//        .frame(maxWidth: .infinity, alignment: .leading)
+//        .background(Color(uiColor: .secondarySystemBackground))
+//        .clipShape(RoundedRectangle(cornerRadius: 20))
+//    }
+//
+//    private func infoRow(title: String, value: String) -> some View {
+//        VStack(alignment: .leading, spacing: 4) {
+//            Text(title)
+//                .font(.subheadline.weight(.semibold))
+//                .foregroundStyle(.secondary)
+//
+//            Text(value)
+//                .frame(maxWidth: .infinity, alignment: .leading)
+//        }
+//    }
+//}
 struct SummaryView: View {
     @Environment(\.dismiss) private var dismiss
     var answers: SurveyAnswers
+    var generatedMockups: [GeneratedMockup]
 
     var body: some View {
         ScrollView {
@@ -298,6 +468,7 @@ struct SummaryView: View {
                 appInfoSection
                 designSection
                 screensSection
+                mockupsSection
             }
             .padding()
         }
@@ -317,7 +488,7 @@ struct SummaryView: View {
             Text("Итог анкеты")
                 .font(.largeTitle.bold())
 
-            Text("Ниже собраны все выбранные параметры и рекомендации по интерфейсу.")
+            Text("Ниже собраны все выбранные параметры, рекомендации и сгенерированные макеты.")
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -392,6 +563,60 @@ struct SummaryView: View {
         }
     }
 
+    private var mockupsSection: some View {
+        infoCard(title: "Сгенерированные макеты") {
+            if generatedMockups.isEmpty {
+                Text("Макеты не были сгенерированы.")
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(generatedMockups, id: \.screenTitle) { mockup in
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(mockup.screenTitle)
+                            .font(.headline)
+
+                        if !mockup.screenComment.isEmpty {
+                            Text(mockup.screenComment)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        AsyncImage(url: mockup.imageURL) { phase in
+                            switch phase {
+                            case .empty:
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(.thinMaterial)
+                                    ProgressView()
+                                }
+                                .frame(height: 280)
+
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+
+                            case .failure:
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(.thinMaterial)
+                                    Text("Не удалось загрузить изображение")
+                                }
+                                .frame(height: 280)
+
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    }
+
+                    if mockup.screenTitle != generatedMockups.last?.screenTitle {
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
+
     private func infoCard<Content: View>(
         title: String,
         @ViewBuilder content: () -> Content
@@ -419,7 +644,6 @@ struct SummaryView: View {
         }
     }
 }
-
 extension SurveyAnswers {
     //часть независящая от экранов
     func basePrompt() -> String {

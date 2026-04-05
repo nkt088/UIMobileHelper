@@ -1,111 +1,53 @@
 import SwiftUI
 import Combine
 
-struct ImageGenerationView: View {
-    @StateObject private var viewModel = ImageGeneratorVM()
-
-    var body: some View {
-        ProgressView()
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Промпт")
-                            .font(.headline)
-
-                        TextEditor(text: $viewModel.prompt)
-                            .frame(minHeight: 140)
-                            .padding(12)
-                            .background(.thinMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                    }
-
-                    Button {
-                        Task {
-                            await viewModel.generate()
-                        }
-                    } label: {
-                        HStack {
-                            if viewModel.isLoading {
-                                ProgressView()
-                            }
-                            Text(viewModel.isLoading ? "Генерация..." : "Сгенерировать")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(viewModel.isLoading || viewModel.prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-
-                    if let error = viewModel.errorMessage {
-                        Text(error)
-                            .foregroundStyle(.red)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-
-                    if let imageURL = viewModel.imageURL {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Результат")
-                                .font(.headline)
-
-                            AsyncImage(url: imageURL) { phase in
-                                switch phase {
-                                case .empty:
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 20)
-                                            .fill(.thinMaterial)
-                                        ProgressView()
-                                    }
-                                    .frame(height: 320)
-
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .scaledToFit()
-                                        .clipShape(RoundedRectangle(cornerRadius: 20))
-
-                                case .failure:
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 20)
-                                            .fill(.thinMaterial)
-                                        Text("Не удалось загрузить изображение")
-                                    }
-                                    .frame(height: 320)
-
-                                @unknown default:
-                                    EmptyView()
-                                }
-                            }
-                        }
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle("Image-1 Medium")
-        }
-    }
+struct GeneratedMockup: Hashable {
+    let screenTitle: String
+    let screenComment: String
+    let imageURL: URL
 }
-
 @MainActor
 final class ImageGeneratorVM: ObservableObject {
-    @Published var prompt = ""
-    @Published var imageURL: URL?
+    @Published var generatedMockups: [GeneratedMockup] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
-
+    @Published var progressText = ""
+    
     private let apiKey = "API_KEY"
     private let createURL = URL(string: "https://gptunnel.ru/v1/media/create")!
     private let resultURL = URL(string: "https://gptunnel.ru/v1/media/result")!
 
-    func generate() async {
+    func generateAll(for answers: SurveyAnswers) async {
         errorMessage = nil
-        imageURL = nil
+        generatedMockups = []
         isLoading = true
+        progressText = "Подготовка..."
+
+        guard !answers.screens.isEmpty else {
+            errorMessage = "Не выбраны экраны для генерации"
+            isLoading = false
+            return
+        }
+
+        let basePrompt = answers.basePrompt()
 
         do {
-            let taskID = try await createTask(prompt: prompt)
-            let finalURL = try await pollResult(taskID: taskID)
-            imageURL = finalURL
+            for index in answers.screens.indices {
+                let screen = answers.screens[index]
+                progressText = "Генерация \(index + 1) из \(answers.screens.count): \(screen.title)"
+
+                let fullPrompt = "\(basePrompt) \(answers.imagePrompt(for: index))"
+                let taskID = try await createTask(prompt: fullPrompt)
+                let finalURL = try await pollResult(taskID: taskID)
+
+                generatedMockups.append(
+                    GeneratedMockup(
+                        screenTitle: screen.title,
+                        screenComment: screen.comment,
+                        imageURL: finalURL
+                    )
+                )
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -116,12 +58,14 @@ final class ImageGeneratorVM: ObservableObject {
     private func createTask(prompt: String) async throws -> String {
         var request = URLRequest(url: createURL)
         request.httpMethod = "POST"
-        request.setValue("\(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(apiKey, forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(CreateRequest(
-            model: "gpt-image-1-medium",
-            prompt: prompt
-        ))
+        request.httpBody = try JSONEncoder().encode(
+            CreateRequest(
+                model: "gpt-image-1-medium",
+                prompt: prompt
+            )
+        )
 
         let (data, response) = try await URLSession.shared.data(for: request)
         try validate(response: response, data: data)
@@ -141,7 +85,7 @@ final class ImageGeneratorVM: ObservableObject {
 
             var request = URLRequest(url: resultURL)
             request.httpMethod = "POST"
-            request.setValue("\(apiKey)", forHTTPHeaderField: "Authorization")
+            request.setValue(apiKey, forHTTPHeaderField: "Authorization")
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder().encode(ResultRequest(taskID: taskID))
 
@@ -172,6 +116,56 @@ final class ImageGeneratorVM: ObservableObject {
         guard 200..<300 ~= http.statusCode else {
             let text = String(data: data, encoding: .utf8) ?? "HTTP \(http.statusCode)"
             throw APIError.invalidResponse(text)
+        }
+    }
+}
+struct ImageGenerationView: View {
+    let answers: SurveyAnswers
+    let onCompleted: ([GeneratedMockup]) -> Void
+    let onFailed: () -> Void
+
+    @StateObject private var viewModel = ImageGeneratorVM()
+    @State private var didStart = false
+
+    var body: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .controlSize(.large)
+
+            Text("Создание макетов")
+                .font(.title2.bold())
+
+            Text(viewModel.progressText.isEmpty ? "Подождите..." : viewModel.progressText)
+                .foregroundStyle(.secondary)
+
+            if let error = viewModel.errorMessage {
+                Text(error)
+                    .foregroundStyle(.red)
+                    .multilineTextAlignment(.center)
+
+                Button("Повторить") {
+                    Task {
+                        await viewModel.generateAll(for: answers)
+                        handleCompletionIfNeeded()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .padding()
+        .task {
+            guard !didStart else { return }
+            didStart = true
+            await viewModel.generateAll(for: answers)
+            handleCompletionIfNeeded()
+        }
+    }
+
+    private func handleCompletionIfNeeded() {
+        if viewModel.errorMessage == nil && !viewModel.generatedMockups.isEmpty {
+            onCompleted(viewModel.generatedMockups)
+        } else if viewModel.errorMessage != nil {
+            onFailed()
         }
     }
 }
