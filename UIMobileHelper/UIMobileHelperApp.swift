@@ -14,7 +14,7 @@ struct UIMobileHelperApp: App {
     var body: some Scene {
         WindowGroup {
             if isFirstLaunch {
-                OnboardingView(isFirstLaunch: $isFirstLaunch)
+                OnboardingView(isFirstLaunch: $isFirstLaunch, showsSkipButton: true)
             } else {
                 RootView()
                     .tint(.teal)

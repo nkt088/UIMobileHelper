@@ -33,7 +33,6 @@ struct RootView: View {
 
 struct MainView: View {
     @State private var previousResults: [PreviousSurveyAnswers] = []
-    @State private var showHelp = false
 
     var body: some View {
         ScrollView {
@@ -52,15 +51,16 @@ struct MainView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Помощь") {
-                    showHelp = true
+                NavigationLink("Помощь") {
+                    OnboardingView(
+                        isFirstLaunch: .constant(false),
+                        showsSkipButton: false
+                    )
                 }
             }
         }
-        .sheet(isPresented: $showHelp) {
-            OnboardingView(isFirstLaunch: .constant(false), isPresentedModally: true)
-        }
         .onAppear {
+            //UserDefaults.standard.set(true, forKey: "isFirstLaunch")
             previousResults = PreviousSurveyAnswersStore.shared.loadAll()
         }
     }
