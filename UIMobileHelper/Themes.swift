@@ -31,6 +31,11 @@ struct CategoryContent: Hashable {
     let title: String
     let description: String
     let fontName: String
+    let fontColor: String
+    let backgroundColor: String
+    let secondaryColor: String
+    let accentColor: String
+    let screens: [String]
 }
 
 enum AppTopic: String, CaseIterable, Identifiable {
@@ -147,237 +152,470 @@ enum AppSubcategory: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .foodDelivery:
             .init(
-                title: "Food Delivery",
-                description: "Apps for ordering and delivering food",
-                fontName: "SF Pro"
+                title: "Доставка еды",
+                description: "Быстрый заказ блюд из ресторанов и кафе с удобным выбором, оплатой и отслеживанием доставки.",
+                fontName: "Inter",
+                fontColor: "#1F1F1F",
+                backgroundColor: "#FFF8F0",
+                secondaryColor: "#FFE2CC",
+                accentColor: "#FF6B35",
+                screens: ["Главная", "Меню ресторана", "Корзина"]
             )
+
         case .shops:
             .init(
-                title: "Shops",
-                description: "Apps for grocery stores and supermarkets",
-                fontName: "SF Pro"
+                title: "Магазины",
+                description: "Приложение для просмотра ассортимента, акций и оформления покупок в розничных магазинах.",
+                fontName: "SF Pro Display",
+                fontColor: "#1E1E1E",
+                backgroundColor: "#F7F9FC",
+                secondaryColor: "#DCE6F2",
+                accentColor: "#3B82F6",
+                screens: ["Каталог", "Карточка товара", "Корзина"]
             )
+
         case .cafes:
             .init(
-                title: "Cafés",
-                description: "Apps for cafés and coffee shops",
-                fontName: "SF Pro"
+                title: "Кафе",
+                description: "Уютный сервис для выбора кафе, просмотра меню, бронирования столика и оформления заказов.",
+                fontName: "Avenir Next",
+                fontColor: "#2B2118",
+                backgroundColor: "#FFF9F4",
+                secondaryColor: "#EED9C4",
+                accentColor: "#C67C4E",
+                screens: ["Список заведений", "Меню", "Бронирование"]
             )
+
         case .restaurants:
             .init(
-                title: "Restaurants",
-                description: "Apps for restaurants and dining",
-                fontName: "SF Pro"
+                title: "Рестораны",
+                description: "Платформа для поиска ресторанов, изучения меню, бронирования и заказа блюд.",
+                fontName: "Helvetica Neue",
+                fontColor: "#201A17",
+                backgroundColor: "#FCF8F3",
+                secondaryColor: "#E7D8C9",
+                accentColor: "#A63D40",
+                screens: ["Каталог ресторанов", "Меню", "Бронирование стола"]
             )
+
         case .banks:
             .init(
-                title: "Banks",
-                description: "Mobile banking and financial service apps",
-                fontName: "SF Pro"
+                title: "Банк",
+                description: "Мобильный банк для контроля счетов, переводов, платежей и управления финансами.",
+                fontName: "Inter",
+                fontColor: "#14213D",
+                backgroundColor: "#F4F8FF",
+                secondaryColor: "#D6E4FF",
+                accentColor: "#2563EB",
+                screens: ["Счета", "Перевод", "История операций"]
             )
+
         case .brokers:
             .init(
-                title: "Brokers",
-                description: "Brokerage and investment platform apps",
-                fontName: "SF Pro"
+                title: "Брокер",
+                description: "Инструмент для инвестиций, анализа портфеля, покупки активов и отслеживания рынка.",
+                fontName: "Roboto",
+                fontColor: "#102A43",
+                backgroundColor: "#F7FAFC",
+                secondaryColor: "#D9E2EC",
+                accentColor: "#0F9D58",
+                screens: ["Портфель", "Каталог активов", "Сделка"]
             )
+
         case .trading:
             .init(
-                title: "Trading",
-                description: "Apps for stock and market trading",
-                fontName: "SF Pro"
+                title: "Трейдинг",
+                description: "Платформа для активной торговли с графиками, ордерами и мониторингом рынка в реальном времени.",
+                fontName: "IBM Plex Sans",
+                fontColor: "#E5E7EB",
+                backgroundColor: "#0F172A",
+                secondaryColor: "#1E293B",
+                accentColor: "#22C55E",
+                screens: ["График актива", "Стакан", "Ордер"]
             )
+
         case .cryptocurrency:
             .init(
-                title: "Cryptocurrency",
-                description: "Apps for crypto wallets and exchanges",
-                fontName: "SF Pro"
+                title: "Криптовалюта",
+                description: "Сервис для хранения, обмена и отслеживания криптовалютных активов и курсов.",
+                fontName: "Inter",
+                fontColor: "#F8FAFC",
+                backgroundColor: "#111827",
+                secondaryColor: "#1F2937",
+                accentColor: "#F59E0B",
+                screens: ["Кошелек", "Курсы", "Обмен"]
             )
+
         case .messengers:
             .init(
-                title: "Messengers",
-                description: "Apps for instant messaging and calls",
-                fontName: "SF Pro"
+                title: "Мессенджер",
+                description: "Приложение для личной и групповой переписки, звонков и обмена файлами.",
+                fontName: "SF Pro Text",
+                fontColor: "#1F2937",
+                backgroundColor: "#F8FAFC",
+                secondaryColor: "#E5E7EB",
+                accentColor: "#3B82F6",
+                screens: ["Список чатов", "Диалог", "Профиль контакта"]
             )
+
         case .socialNetworks:
             .init(
-                title: "Social Networks",
-                description: "Apps for social media and communities",
-                fontName: "SF Pro"
+                title: "Социальная сеть",
+                description: "Платформа для общения, публикации контента, подписок и взаимодействия с аудиторией.",
+                fontName: "Inter",
+                fontColor: "#111827",
+                backgroundColor: "#FFFFFF",
+                secondaryColor: "#E5E7EB",
+                accentColor: "#EC4899",
+                screens: ["Лента", "Профиль", "Создание публикации"]
             )
+
         case .email:
             .init(
-                title: "Email",
-                description: "Apps for email communication",
-                fontName: "SF Pro"
+                title: "Почта",
+                description: "Удобный почтовый клиент для чтения, сортировки и отправки писем.",
+                fontName: "Roboto",
+                fontColor: "#1F2937",
+                backgroundColor: "#F9FAFB",
+                secondaryColor: "#E5E7EB",
+                accentColor: "#2563EB",
+                screens: ["Входящие", "Письмо", "Создание письма"]
             )
+
         case .musicPlayer:
             .init(
-                title: "Music Player",
-                description: "Apps for listening to music and managing playlists",
-                fontName: "SF Pro"
+                title: "Музыкальный плеер",
+                description: "Приложение для прослушивания музыки, управления плейлистами и поиска треков.",
+                fontName: "Avenir Next",
+                fontColor: "#F9FAFB",
+                backgroundColor: "#111111",
+                secondaryColor: "#262626",
+                accentColor: "#8B5CF6",
+                screens: ["Список треков", "Плеер", "Плейлисты"]
             )
+
         case .videoHosting:
             .init(
-                title: "Video Hosting",
-                description: "Apps for watching and publishing video content",
-                fontName: "SF Pro"
+                title: "Видеохостинг",
+                description: "Сервис для просмотра, публикации и поиска видеоконтента по темам и авторам.",
+                fontName: "Roboto",
+                fontColor: "#111827",
+                backgroundColor: "#FFFFFF",
+                secondaryColor: "#F3F4F6",
+                accentColor: "#EF4444",
+                screens: ["Главная", "Видео", "Канал автора"]
             )
+
         case .streaming:
             .init(
-                title: "Streaming",
-                description: "Apps for streaming movies, shows, and live content",
-                fontName: "SF Pro"
+                title: "Стриминг",
+                description: "Платформа для просмотра фильмов, сериалов и трансляций с персональными рекомендациями.",
+                fontName: "Inter",
+                fontColor: "#F9FAFB",
+                backgroundColor: "#0B1020",
+                secondaryColor: "#1A2238",
+                accentColor: "#E11D48",
+                screens: ["Главная", "Карточка контента", "Плеер"]
             )
+
         case .games:
             .init(
-                title: "Games",
-                description: "Apps for mobile gaming and entertainment",
-                fontName: "SF Pro"
+                title: "Игры",
+                description: "Игровой сервис с каталогом, достижениями, рейтингами и быстрым запуском игр.",
+                fontName: "Montserrat",
+                fontColor: "#F8FAFC",
+                backgroundColor: "#140F2D",
+                secondaryColor: "#2A1F54",
+                accentColor: "#A855F7",
+                screens: ["Каталог игр", "Карточка игры", "Профиль игрока"]
             )
+
         case .courses:
             .init(
-                title: "Courses",
-                description: "Apps with structured educational courses and lessons",
-                fontName: "SF Pro"
+                title: "Курсы",
+                description: "Образовательное приложение для прохождения онлайн-курсов, модулей и тестов.",
+                fontName: "Inter",
+                fontColor: "#1F2937",
+                backgroundColor: "#F8FAFC",
+                secondaryColor: "#DBEAFE",
+                accentColor: "#2563EB",
+                screens: ["Список курсов", "Программа курса", "Урок"]
             )
+
         case .languages:
             .init(
-                title: "Languages",
-                description: "Apps for learning foreign languages",
-                fontName: "SF Pro"
+                title: "Изучение языков",
+                description: "Сервис для изучения иностранных языков с уроками, упражнениями и практикой слов.",
+                fontName: "Nunito Sans",
+                fontColor: "#1F2937",
+                backgroundColor: "#F0FDF4",
+                secondaryColor: "#D1FAE5",
+                accentColor: "#10B981",
+                screens: ["Список уроков", "Тренировка слов", "Прогресс"]
             )
+
         case .lectures:
             .init(
-                title: "Lectures",
-                description: "Apps for watching lectures and educational videos",
-                fontName: "SF Pro"
+                title: "Лекции",
+                description: "Платформа для просмотра видеолекций, материалов и расписания учебных занятий.",
+                fontName: "Roboto",
+                fontColor: "#1E293B",
+                backgroundColor: "#F8FAFC",
+                secondaryColor: "#E2E8F0",
+                accentColor: "#6366F1",
+                screens: ["Каталог лекций", "Лекция", "Материалы"]
             )
+
         case .trainers:
             .init(
-                title: "Trainers",
-                description: "Apps with practice exercises and skill training",
-                fontName: "SF Pro"
+                title: "Тренажёры",
+                description: "Обучающее приложение для практики навыков, повторения и выполнения упражнений.",
+                fontName: "Inter",
+                fontColor: "#1F2937",
+                backgroundColor: "#FFFDF5",
+                secondaryColor: "#FEF3C7",
+                accentColor: "#F59E0B",
+                screens: ["Список упражнений", "Тренировка", "Результаты"]
             )
+
         case .taxi:
             .init(
-                title: "Taxi",
-                description: "Apps for booking taxi rides",
-                fontName: "SF Pro"
+                title: "Такси",
+                description: "Сервис для быстрого заказа поездок, выбора тарифа и отслеживания машины на карте.",
+                fontName: "SF Pro Display",
+                fontColor: "#111827",
+                backgroundColor: "#FFFDE7",
+                secondaryColor: "#FEF08A",
+                accentColor: "#FACC15",
+                screens: ["Карта", "Выбор тарифа", "Поездка"]
             )
+
         case .carSharing:
             .init(
-                title: "Car Sharing",
-                description: "Apps for short-term car rental and sharing",
-                fontName: "SF Pro"
+                title: "Каршеринг",
+                description: "Приложение для поиска, бронирования и аренды автомобилей на короткий срок.",
+                fontName: "Inter",
+                fontColor: "#102A43",
+                backgroundColor: "#F0F9FF",
+                secondaryColor: "#D9F0FF",
+                accentColor: "#0EA5E9",
+                screens: ["Карта автомобилей", "Карточка авто", "Аренда"]
             )
+
         case .tickets:
             .init(
-                title: "Tickets",
-                description: "Apps for buying transport and travel tickets",
-                fontName: "SF Pro"
+                title: "Билеты",
+                description: "Сервис для поиска, покупки и хранения билетов на транспорт и мероприятия.",
+                fontName: "Roboto",
+                fontColor: "#1F2937",
+                backgroundColor: "#F9FAFB",
+                secondaryColor: "#E0E7FF",
+                accentColor: "#4F46E5",
+                screens: ["Поиск билетов", "Результаты", "Электронный билет"]
             )
+
         case .navigation:
             .init(
-                title: "Navigation",
-                description: "Apps for maps, routes, and navigation",
-                fontName: "SF Pro"
+                title: "Навигация",
+                description: "Приложение для построения маршрутов, пошаговой навигации и оценки времени в пути.",
+                fontName: "Inter",
+                fontColor: "#0F172A",
+                backgroundColor: "#F8FAFC",
+                secondaryColor: "#DBEAFE",
+                accentColor: "#2563EB",
+                screens: ["Карта", "Маршрут", "Навигация в пути"]
             )
+
         case .fitness:
             .init(
-                title: "Fitness",
-                description: "Apps for workouts, activity, and fitness programs",
-                fontName: "SF Pro"
+                title: "Фитнес",
+                description: "Сервис для тренировок, отслеживания активности и ведения спортивного прогресса.",
+                fontName: "Montserrat",
+                fontColor: "#1F2937",
+                backgroundColor: "#F0FDF4",
+                secondaryColor: "#D1FAE5",
+                accentColor: "#22C55E",
+                screens: ["Тренировки", "План занятия", "Статистика"]
             )
+
         case .medicine:
             .init(
-                title: "Medicine",
-                description: "Apps for medical services, consultations, and prescriptions",
-                fontName: "SF Pro"
+                title: "Медицина",
+                description: "Медицинское приложение для записи к врачу, хранения данных и получения рекомендаций.",
+                fontName: "Inter",
+                fontColor: "#12324A",
+                backgroundColor: "#F5FBFF",
+                secondaryColor: "#D6EEF8",
+                accentColor: "#06B6D4",
+                screens: ["Запись к врачу", "Медкарта", "Приём"]
             )
+
         case .conditionTracking:
             .init(
-                title: "Condition Tracking",
-                description: "Apps for tracking health indicators and wellbeing",
-                fontName: "SF Pro"
+                title: "Отслеживание состояния",
+                description: "Приложение для фиксации самочувствия, симптомов, показателей и истории изменений.",
+                fontName: "Roboto",
+                fontColor: "#1F2937",
+                backgroundColor: "#FFF7FB",
+                secondaryColor: "#FBCFE8",
+                accentColor: "#DB2777",
+                screens: ["Дневник состояния", "Добавление записи", "График показателей"]
             )
+
         case .marketplaces:
             .init(
-                title: "Marketplaces",
-                description: "Apps for buying goods from online marketplaces",
-                fontName: "SF Pro"
+                title: "Маркетплейс",
+                description: "Платформа для покупки товаров у разных продавцов с отзывами и сравнением цен.",
+                fontName: "Inter",
+                fontColor: "#1F2937",
+                backgroundColor: "#FFFFFF",
+                secondaryColor: "#E5E7EB",
+                accentColor: "#F97316",
+                screens: ["Каталог", "Карточка товара", "Корзина"]
             )
+
         case .discounts:
             .init(
-                title: "Discounts",
-                description: "Apps for finding deals, coupons, and special offers",
-                fontName: "SF Pro"
+                title: "Скидки",
+                description: "Сервис для поиска акций, промокодов и выгодных предложений по категориям.",
+                fontName: "Nunito Sans",
+                fontColor: "#1F2937",
+                backgroundColor: "#FFF7ED",
+                secondaryColor: "#FED7AA",
+                accentColor: "#F97316",
+                screens: ["Лента акций", "Карточка предложения"]
             )
+
         case .accommodationBooking:
             .init(
-                title: "Accommodation Booking",
-                description: "Apps for booking hotels, apartments, and housing",
-                fontName: "SF Pro"
+                title: "Бронирование жилья",
+                description: "Приложение для поиска и бронирования отелей, апартаментов и другого жилья.",
+                fontName: "Avenir Next",
+                fontColor: "#1F2937",
+                backgroundColor: "#F8FAFC",
+                secondaryColor: "#CFFAFE",
+                accentColor: "#0891B2",
+                screens: ["Поиск жилья", "Карточка объекта", "Бронирование"]
             )
+
         case .maps:
             .init(
-                title: "Maps",
-                description: "Apps for maps, routes, and travel navigation",
-                fontName: "SF Pro"
+                title: "Карты",
+                description: "Картографический сервис для поиска мест, просмотра районов и изучения инфраструктуры.",
+                fontName: "SF Pro Text",
+                fontColor: "#0F172A",
+                backgroundColor: "#F0FDF4",
+                secondaryColor: "#DCFCE7",
+                accentColor: "#16A34A",
+                screens: ["Карта", "Карточка места", "Поиск"]
             )
+
         case .crm:
             .init(
                 title: "CRM",
-                description: "Apps for customer relationship management",
-                fontName: "SF Pro"
+                description: "Система для управления клиентами, сделками, задачами и продажами.",
+                fontName: "Inter",
+                fontColor: "#1E293B",
+                backgroundColor: "#F8FAFC",
+                secondaryColor: "#E2E8F0",
+                accentColor: "#3B82F6",
+                screens: ["Список клиентов", "Карточка сделки", "Воронка продаж"]
             )
+
         case .taskManagers:
             .init(
-                title: "Task Managers",
-                description: "Apps for managing tasks, teams, and workflows",
-                fontName: "SF Pro"
+                title: "Менеджер задач",
+                description: "Инструмент для планирования, распределения и контроля выполнения задач.",
+                fontName: "Roboto",
+                fontColor: "#1F2937",
+                backgroundColor: "#F9FAFB",
+                secondaryColor: "#E5E7EB",
+                accentColor: "#6366F1",
+                screens: ["Список задач", "Доска проектов", "Карточка задачи"]
             )
+
         case .accounting:
             .init(
-                title: "Accounting",
-                description: "Apps for finance tracking, reporting, and bookkeeping",
-                fontName: "SF Pro"
+                title: "Бухгалтерия",
+                description: "Сервис для учёта финансовых операций, документов, расходов и отчётности.",
+                fontName: "IBM Plex Sans",
+                fontColor: "#1F2937",
+                backgroundColor: "#F8FAFC",
+                secondaryColor: "#E2E8F0",
+                accentColor: "#0F766E",
+                screens: ["Операции", "Отчёты", "Документы"]
             )
+
         case .documentFlow:
             .init(
-                title: "Document Flow",
-                description: "Apps for document management and business paperwork",
-                fontName: "SF Pro"
+                title: "Документооборот",
+                description: "Система для согласования, хранения и отслеживания статусов документов.",
+                fontName: "Inter",
+                fontColor: "#1E293B",
+                backgroundColor: "#F8FAFC",
+                secondaryColor: "#E2E8F0",
+                accentColor: "#475569",
+                screens: ["Список документов", "Карточка документа", "Согласование"]
             )
+
         case .notes:
             .init(
-                title: "Notes",
-                description: "Apps for notes, text capture, and quick ideas",
-                fontName: "SF Pro"
+                title: "Заметки",
+                description: "Простое приложение для создания, хранения и структурирования личных записей.",
+                fontName: "Avenir Next",
+                fontColor: "#2D2A26",
+                backgroundColor: "#FFFDF7",
+                secondaryColor: "#F5EFD8",
+                accentColor: "#EAB308",
+                screens: ["Список заметок", "Редактор заметки"]
             )
+
         case .weather:
             .init(
-                title: "Weather",
-                description: "Apps for weather forecasts and climate information",
-                fontName: "SF Pro"
+                title: "Погода",
+                description: "Приложение для просмотра текущей погоды, прогноза и погодных показателей.",
+                fontName: "SF Pro Display",
+                fontColor: "#0F172A",
+                backgroundColor: "#EFF6FF",
+                secondaryColor: "#BFDBFE",
+                accentColor: "#3B82F6",
+                screens: ["Текущая погода", "Прогноз на неделю"]
             )
+
         case .calendar:
             .init(
-                title: "Calendar",
-                description: "Apps for planning events, schedules, and reminders",
-                fontName: "SF Pro"
+                title: "Календарь",
+                description: "Инструмент для планирования встреч, событий и управления расписанием.",
+                fontName: "Inter",
+                fontColor: "#1F2937",
+                backgroundColor: "#FFFFFF",
+                secondaryColor: "#F3F4F6",
+                accentColor: "#EF4444",
+                screens: ["Месяц", "Список событий", "Создание события"]
             )
+
         case .fileManagers:
             .init(
-                title: "File Managers",
-                description: "Apps for managing files, folders, and storage",
-                fontName: "SF Pro"
+                title: "Файловый менеджер",
+                description: "Приложение для просмотра, сортировки, перемещения и организации файлов.",
+                fontName: "Roboto",
+                fontColor: "#1F2937",
+                backgroundColor: "#F9FAFB",
+                secondaryColor: "#E5E7EB",
+                accentColor: "#2563EB",
+                screens: ["Файлы", "Папка", "Просмотр файла"]
             )
+
         case .rentAndBuyHousing:
             .init(
-                title: "Rent and Buy Housing",
-                description: "Apps for renting, buying, and browsing real estate",
-                fontName: "SF Pro"
+                title: "Аренда и покупка жилья",
+                description: "Сервис для поиска недвижимости, фильтрации объявлений и просмотра объектов.",
+                fontName: "Inter",
+                fontColor: "#1F2937",
+                backgroundColor: "#F8FAFC",
+                secondaryColor: "#DBEAFE",
+                accentColor: "#0EA5E9",
+                screens: ["Каталог недвижимости", "Карточка объекта", "Избранное"]
             )
         }
     }

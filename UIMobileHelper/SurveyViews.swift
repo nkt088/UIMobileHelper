@@ -36,7 +36,7 @@ struct SurveyFlowView : View {
         .toolbar(.hidden, for: .tabBar)
         .navigationBarBackButtonHidden(true)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
+            ToolbarItem(placement: .topBarLeading) {
                 Button{
                     showExitAlert = true
                 } label: {
@@ -61,8 +61,15 @@ struct SurveyFlowView : View {
             OSQuestView(OS: $answers.OS)
             case .theme:
             ThemeQuestView(topic: $answers.themeSelection.topic,subcategory: $answers.themeSelection.subcategory)
-            case .age :
-            AgeQuestView(age: $answers.age)
+            case .screens:
+            ScreenQuestView(
+                availableScreens: answers.themeSelection.subcategory.content.screens.map {
+                    Screen(title: $0, comment: "")
+                },
+                screens: $answers.screens
+            )
+            case .imageGeneration :
+            ImageGenerationView()
             case .summary :
             SummaryView(answers: answers)
         }
@@ -154,41 +161,326 @@ struct ThemeQuestView: View {
         .padding()
     }
 }
-struct AgeQuestView : View {
-    @Binding var age : String
+
+struct ScreenQuestView: View {
+    let availableScreens: [Screen]
+    @Binding var screens: [Screen]
+    @State private var customScreenTitle = ""
+    @State private var customScreenComment = ""
+
     var body: some View {
-        VStack {
-            Text("Введите возраст")
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Выберите экраны")
                 .font(.title)
-            TextField("write age here", text : $age)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .padding()
-                .overlay {
-                    RoundedRectangle(cornerRadius: 20).stroke(.secondary, lineWidth: 1)
+
+            ForEach(availableScreens, id: \.title) { screen in
+                VStack(alignment: .leading, spacing: 8) {
+                    Button {
+                        toggleScreen(screen)
+                    } label: {
+                        HStack {
+                            Image(systemName: isSelected(screen) ? "checkmark.square.fill" : "square")
+                            Text(screen.title)
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.plain)
+
+                    if isSelected(screen) {
+                        TextField(
+                            "Комментарий к экрану",
+                            text: commentBinding(for: screen)
+                        )
+                        .padding()
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(.secondary, lineWidth: 1)
+                        }
+                    }
                 }
+                .padding()
+                .background(Color(uiColor: .secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Другой экран")
+                    .font(.headline)
+
+                TextField("Название экрана", text: $customScreenTitle)
+                    .padding()
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(.secondary, lineWidth: 1)
+                    }
+
+                TextField("Комментарий к экрану", text: $customScreenComment)
+                    .padding()
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(.secondary, lineWidth: 1)
+                    }
+
+                Button("Добавить экран") {
+                    addCustomScreen()
+                }
+                .disabled(customScreenTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+            .padding()
+            .background(Color(uiColor: .secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+
+            Spacer()
         }
         .padding()
     }
+
+    private func indexOfScreen(_ screen: Screen) -> Int? {
+        for index in screens.indices {
+            if screens[index].title == screen.title {
+                return index
+            }
+        }
+        return nil
+    }
+
+    private func isSelected(_ screen: Screen) -> Bool {
+        indexOfScreen(screen) != nil
+    }
+
+    private func toggleScreen(_ screen: Screen) {
+        if let index = indexOfScreen(screen) {
+            screens.remove(at: index)
+        } else {
+            screens.append(Screen(title: screen.title, comment: ""))
+        }
+    }
+
+    private func commentBinding(for screen: Screen) -> Binding<String> {
+        Binding(
+            get: {
+                if let index = indexOfScreen(screen) {
+                    return screens[index].comment
+                }
+                return ""
+            },
+            set: { newValue in
+                if let index = indexOfScreen(screen) {
+                    screens[index].comment = newValue
+                }
+            }
+        )
+    }
+
+    private func addCustomScreen() {
+        let trimmedTitle = customScreenTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedComment = customScreenComment.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedTitle.isEmpty else { return }
+        guard indexOfScreen(Screen(title: trimmedTitle, comment: "")) == nil else { return }
+        screens.append(
+            Screen(
+                title: trimmedTitle,
+                comment: trimmedComment
+            )
+        )
+        customScreenTitle = ""
+        customScreenComment = ""
+    }
 }
-struct SummaryView : View {
-    var answers : SurveyAnswers
+struct SummaryView: View {
+    @Environment(\.dismiss) private var dismiss
+    var answers: SurveyAnswers
+
     var body: some View {
-        VStack {
-            Text("Результат")
-                .font(.title)
-            Divider()
-            VStack {
-                Text(answers.themeSelection.topic.title)
-                Text(answers.themeSelection.subcategory.content.title)
-                Text(answers.themeSelection.subcategory.content.description)
-                Text(answers.themeSelection.subcategory.content.fontName)
-                Text(answers.age)
-                    .font(.title2)
-                Text(answers.OS)
-                    .font(.title2)
-            }.padding(4)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                headerSection
+                appInfoSection
+                designSection
+                screensSection
+            }
+            .padding()
+        }
+        .navigationTitle("Результат")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Завершить") {
+                    dismiss()
+                }
+            }
+        }
+    }
+
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Итог анкеты")
+                .font(.largeTitle.bold())
+
+            Text("Ниже собраны все выбранные параметры и рекомендации по интерфейсу.")
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var appInfoSection: some View {
+        infoCard(title: "Общая информация") {
+            infoRow(title: "ОС", value: answers.OS)
+            infoRow(title: "Тема", value: answers.themeSelection.topic.title)
+            infoRow(title: "Подтема", value: answers.themeSelection.subcategory.content.title)
+            infoRow(title: "Описание", value: answers.themeSelection.subcategory.content.description)
+        }
+    }
+
+    private var designSection: some View {
+        infoCard(title: "Рекомендации по интерфейсу") {
+            infoRow(title: "Шрифт", value: answers.themeSelection.subcategory.content.fontName)
+            infoRow(title: "Цвет шрифта", value: answers.themeSelection.subcategory.content.fontColor)
+            infoRow(title: "Цвет фона", value: answers.themeSelection.subcategory.content.backgroundColor)
+            infoRow(title: "Вторичный цвет", value: answers.themeSelection.subcategory.content.secondaryColor)
+            infoRow(title: "Акцентный цвет", value: answers.themeSelection.subcategory.content.accentColor)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Рекомендуемые экраны")
+                    .font(.headline)
+
+                ForEach(answers.themeSelection.subcategory.content.screens, id: \.self) { screen in
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "circle.fill")
+                            .font(.system(size: 6))
+                            .padding(.top, 6)
+                            .foregroundStyle(.secondary)
+
+                        Text(screen)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+            }
+            .padding(.top, 4)
+        }
+    }
+
+    private var screensSection: some View {
+        infoCard(title: "Выбранные пользователем экраны") {
+            if answers.screens.isEmpty {
+                Text("Пользователь не выбрал дополнительные экраны.")
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(answers.screens, id: \.title) { screen in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(screen.title)
+                            .font(.headline)
+
+                        if screen.comment.isEmpty {
+                            Text("Комментарий не указан")
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Text(screen.comment)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(Color(uiColor: .tertiarySystemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+
+                    if screen.title != answers.screens.last?.title {
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
+
+    private func infoCard<Content: View>(
+        title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(title)
+                .font(.title3.bold())
+
+            content()
         }
         .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(uiColor: .secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+
+    private func infoRow(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            Text(value)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }
 
+extension SurveyAnswers {
+    //часть независящая от экранов
+    func basePrompt() -> String {
+        guard !screens.isEmpty else {
+            return ""
+        }
+        return """
+        Создать изображение макета интерфейса мобильного приложения для \(OS). Категория приложения: \(themeSelection.topic.title). Подкатегория: \(themeSelection.subcategory.content.title). Использовать шрифт \(themeSelection.subcategory.content.fontName) с цветом текста \(themeSelection.subcategory.content.fontColor). Задний фон должен быть цвета \(themeSelection.subcategory.content.backgroundColor). Акцентный цвет для элементов интерфейса оформить в цвете \(themeSelection.subcategory.content.secondaryColor). Акцентные элементы выделить цветом \(themeSelection.subcategory.content.accentColor). Навигация реализована через нижний таббар. Макет должен быть помещён внутрь рамки \(OS) телефона.
+        """
+    }
+    //часть индивидуальная для каждого экрана
+    func imagePrompt(for index: Int) -> String {
+        guard screens.indices.contains(index) else {
+            return ""
+        }
+        let screen = screens[index]
+        return """
+        Необходимо сгенерировать макет экрана: \(screen.title). Наполнение экрана должно соответствовать следующему описанию: \(screen.comment).
+        """
+    }
+}
+
+//struct SummaryView : View {
+//    @Environment(\.dismiss) private var dismiss
+//    var answers : SurveyAnswers
+//    var body: some View {
+//        VStack {
+//            Text("Результат")
+//                .font(.title)
+//            Divider()
+//            VStack {
+//                Text(answers.themeSelection.topic.title)
+//                Text(answers.themeSelection.subcategory.content.title)
+//                Text(answers.themeSelection.subcategory.content.description)
+//                Text(answers.themeSelection.subcategory.content.fontName)
+//                    .font(.title2)
+//                Text(answers.OS)
+//                    .font(.title2)
+//                ForEach(answers.screens, id: \.title) { screen in
+//                    Text(screen.title)
+//                    Text(screen.comment)
+//                }
+//            }
+//            .padding()
+//        }
+//        .padding()
+//
+//        .toolbar {
+//            ToolbarItem(placement: .principal){
+//                Text("Результат")
+//            }
+//            ToolbarItem(placement: .topBarTrailing) {
+//                Button{
+//                    dismiss()
+//                } label: {
+//                    HStack {
+//                        Text("Завершить")
+//                        Image(systemName: "chevron.right")
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
