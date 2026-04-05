@@ -518,8 +518,10 @@ extension SurveyAnswers {
 //для summaryview
 struct MockupImageView: View {
     let url: URL
-
+    
     var body: some View {
+        //let _ = print("MockupImageView url:", url.absoluteString, "isFileURL:", url.isFileURL)
+
         if url.isFileURL, let uiImage = UIImage(contentsOfFile: url.path) {
             Image(uiImage: uiImage)
                 .resizable()
