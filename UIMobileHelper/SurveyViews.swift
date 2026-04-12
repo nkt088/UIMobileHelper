@@ -319,9 +319,10 @@ struct ScreenQuestView: View {
                     .buttonStyle(.plain)
 
                     if isSelected(screen) {
+                        let binding = commentBinding(for: screen)
                         TextField(
                             "Комментарий к экрану",
-                            text: commentBinding(for: screen)
+                            text: binding
                         )
                         .focused($isFocused)
                         .padding()
@@ -329,6 +330,10 @@ struct ScreenQuestView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(.secondary, lineWidth: 1)
                         }
+
+                        Text("\(binding.wrappedValue.count)/600")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .padding()
@@ -339,7 +344,6 @@ struct ScreenQuestView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Другой экран")
                     .font(.headline)
-
                 TextField("Название экрана", text: $customScreenTitle)
                     .focused($isFocused)
                     .padding()
@@ -347,7 +351,12 @@ struct ScreenQuestView: View {
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(.secondary, lineWidth: 1)
                     }
-
+                    .onChange(of: customScreenTitle) {
+                        customScreenTitle = String(customScreenTitle.prefix(100))
+                    }
+                Text("\(customScreenTitle.count)/100")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 TextField("Комментарий к экрану", text: $customScreenComment)
                     .focused($isFocused)
                     .padding()
@@ -355,6 +364,12 @@ struct ScreenQuestView: View {
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(.secondary, lineWidth: 1)
                     }
+                    .onChange(of: customScreenComment) {
+                        customScreenComment = String(customScreenComment.prefix(600))
+                    }
+                Text("\(customScreenComment.count)/600")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
                 Button("Добавить экран") {
                     isFocused = false
@@ -406,7 +421,7 @@ struct ScreenQuestView: View {
             },
             set: { newValue in
                 if let index = indexOfScreen(screen) {
-                    screens[index].comment = newValue
+                    screens[index].comment = String(newValue.prefix(600))
                 }
             }
         )
