@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import MessageUI
 
 struct GeneratedMockup: Hashable {
     let screenTitle: String
@@ -73,7 +74,8 @@ final class ImageGeneratorVM: ObservableObject {
         let decoded = try JSONDecoder().decode(CreateResponse.self, from: data)
 
         guard let id = decoded.id, !id.isEmpty else {
-            throw APIError.invalidResponse("Сервер не вернул task id")
+            print("Сервер не вернул task id, нет apikey")
+            throw APIError.invalidResponse("Нет подключения к серверу")
         }
 
         return id
@@ -126,6 +128,8 @@ struct ImageGenerationView: View {
 
     @StateObject private var viewModel = ImageGeneratorVM()
     @State private var didStart = false
+    @State private var showMailComposer = false
+    @State private var showMailAlert = false
 
     var body: some View {
         VStack(spacing: 16) {
@@ -150,6 +154,15 @@ struct ImageGenerationView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
+                Button("Сообщить об ошибке") {
+                    if MFMailComposeViewController.canSendMail() {
+                        showMailComposer = true
+                    } else {
+                        openMailFallback()
+                    }
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 16)
             }
         }
         .padding()
@@ -159,6 +172,45 @@ struct ImageGenerationView: View {
             await viewModel.generateAll(for: answers)
             handleCompletionIfNeeded()
         }
+        .sheet(isPresented: $showMailComposer) {
+            MailComposeView(
+                subject: "Сообщение об ошибке",
+                recipients: ["@mail.ru"],
+                body: bugReportBody
+            )
+        }
+        .alert("Не удалось открыть почту", isPresented: $showMailAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("На устройстве не настроено почтовое приложение.")
+        }
+    }
+    private var bugReportBody: String {
+        """
+        Опишите, что произошло:
+
+        Ошибка:
+        \(viewModel.errorMessage ?? "Неизвестно")
+
+        Экран:
+        \(viewModel.progressText)
+
+        Устройство: \(UIDevice.current.model)
+        iOS: \(UIDevice.current.systemVersion)
+        """
+    }
+    private func openMailFallback() {
+        let subject = "Сообщение об ошибке".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let body = bugReportBody.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let email = "@mail.ru"
+
+        guard let url = URL(string: "mailto:\(email)?subject=\(subject)&body=\(body)"),
+              UIApplication.shared.canOpenURL(url) else {
+            showMailAlert = true
+            return
+        }
+
+        UIApplication.shared.open(url)
     }
 
     private func handleCompletionIfNeeded() {

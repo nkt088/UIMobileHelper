@@ -33,6 +33,9 @@ struct RootView: View {
 
 struct MainView: View {
     @State private var previousResults: [PreviousSurveyAnswers] = []
+    @State private var itemToDelete: PreviousSurveyAnswers?
+    @State private var showDeleteAlert = false
+    @State private var isEditingResults = false
 
     var body: some View {
         ScrollView {
@@ -63,6 +66,17 @@ struct MainView: View {
             //UserDefaults.standard.set(true, forKey: "isFirstLaunch")
             previousResults = PreviousSurveyAnswersStore.shared.loadAll()
         }
+        .alert("Удалить результат?", isPresented: $showDeleteAlert) {
+            Button("Отмена", role: .cancel) {
+                itemToDelete = nil
+            }
+            Button("Удалить", role: .destructive) {
+                guard let itemToDelete else { return }
+                deleteResult(itemToDelete)
+                self.itemToDelete = nil
+            }
+        } message: {
+            Text("Результат будет удалён без возможности восстановления.")        }
     }
 
     private var startCard: some View {
@@ -102,31 +116,69 @@ struct MainView: View {
 
     private var resultsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Прошлые прохождения")
-                .font(.title3.bold())
+            HStack {
+                Text("Прошлые прохождения")
+                    .font(.title3.bold())
 
-            ForEach(previousResults.sorted(by: { $0.date > $1.date }), id: \.date) { item in
-                NavigationLink {
-                    SummaryView(
-                        answers: item.answers,
-                        generatedMockups: PreviousSurveyAnswersStore.shared.mockups(from: item)
-                    )
-                } label: {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("\(item.answers.themeSelection.topic.title) / \(item.answers.themeSelection.subcategory.content.title)")
-                            .font(.headline)
-                            .foregroundStyle(.primary)
+                Spacer()
 
-                        Text(item.date.formatted(date: .abbreviated, time: .shortened))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                Button {
+                    withAnimation {
+                        isEditingResults.toggle()
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.background.secondary, in: RoundedRectangle(cornerRadius: 16))
+                } label: {
+                    Image(systemName: isEditingResults ? "checkmark.circle.fill" : "square.and.pencil")
+                        .bold()
                 }
-                .buttonStyle(.plain)
+                .padding(.trailing, 8)
             }
+            ForEach(previousResults.sorted(by: { $0.date > $1.date }), id: \.date) { item in
+                ZStack(alignment: .trailing) {
+                    NavigationLink {
+                        SummaryView(
+                            answers: item.answers,
+                            generatedMockups: PreviousSurveyAnswersStore.shared.mockups(from: item)
+                        )
+                    } label: {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("\(item.answers.themeSelection.topic.title) / \(item.answers.themeSelection.subcategory.content.title)")
+                                .font(.headline)
+                                .foregroundStyle(.primary)
+                            
+                            Text(item.date.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        .padding(.trailing, isEditingResults ? 28 : 0)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(.background.secondary, in: RoundedRectangle(cornerRadius: 16))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isEditingResults)
+                    
+                    if isEditingResults {
+                        Button {
+                            itemToDelete = item
+                            showDeleteAlert = true
+                        } label: {
+                            Image(systemName: "trash")
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: 44, maxHeight: 44)
+                        }
+                        .padding(.trailing, 8)
+                        .transition(.opacity.combined(with: .scale))
+                    }
+                }
+            }
+        }
+    }
+    private func deleteResult(_ item: PreviousSurveyAnswers) {
+        do {
+            try PreviousSurveyAnswersStore.shared.delete(item)
+            previousResults.removeAll { $0.date == item.date }
+        } catch {
+            print("delete error:", error)
         }
     }
 }

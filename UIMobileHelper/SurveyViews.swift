@@ -66,7 +66,12 @@ struct SurveyFlowView : View {
                 } label: {
                     HStack {
                         Image(systemName: "chevron.left")
-                        Text("На главную")
+                        if step == .summary {
+                            Text("Не сохранять")
+                        }
+                        else {
+                            Text("На главную")
+                        }
                     }
                 }
             }
@@ -126,16 +131,48 @@ struct SurveyFlowView : View {
             removal: .move(edge: isForward ? .leading : .trailing).combined(with: .opacity)
         )
     }
-
+    
     private func goNext() {
         if step == .screens {
             generationFailed = false
             isForward = true
-            withAnimation(.easeInOut) {
-                step = answers.screens.isEmpty ? .summary : .imageGeneration
+
+            if answers.screens.isEmpty {
+                Task {
+                    try? await PreviousSurveyAnswersStore.shared.save(
+                        answers: answers,
+                        mockups: []
+                    )
+                    await MainActor.run {
+                        withAnimation(.easeInOut) {
+                            step = .summary
+                        }
+                    }
+                }
+            } else {
+                withAnimation(.easeInOut) {
+                    step = .imageGeneration
+                }
             }
             return
         }
+
+        if step == .imageGeneration, generationFailed {
+            Task {
+                try? await PreviousSurveyAnswersStore.shared.save(
+                    answers: answers,
+                    mockups: []
+                )
+                await MainActor.run {
+                    isForward = true
+                    withAnimation(.easeInOut) {
+                        step = .summary
+                    }
+                }
+            }
+            return
+        }
+
         guard let next = SurveyStep(rawValue: step.rawValue + 1) else { return }
         isForward = true
         withAnimation(.easeInOut) {
