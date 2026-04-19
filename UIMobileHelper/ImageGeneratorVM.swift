@@ -2,11 +2,6 @@ import SwiftUI
 import Combine
 import MessageUI
 
-struct GeneratedMockup: Hashable {
-    let screenTitle: String
-    let screenComment: String
-    let imageURL: URL
-}
 @MainActor
 final class ImageGeneratorVM: ObservableObject {
     @Published var generatedMockups: [GeneratedMockup] = []
@@ -14,7 +9,7 @@ final class ImageGeneratorVM: ObservableObject {
     @Published var errorMessage: String?
     @Published var progressText = ""
     
-    private let apiKey = "apikey"
+    private let apiKey = ""
     private let createURL = URL(string: "https://gptunnel.ru/v1/media/create")!
     private let resultURL = URL(string: "https://gptunnel.ru/v1/media/result")!
 
@@ -175,7 +170,7 @@ struct ImageGenerationView: View {
         .sheet(isPresented: $showMailComposer) {
             MailComposeView(
                 subject: "Сообщение об ошибке",
-                recipients: ["@mail.ru"],
+                recipients: ["uihelp@mail.ru"],
                 body: bugReportBody
             )
         }
@@ -202,7 +197,7 @@ struct ImageGenerationView: View {
     private func openMailFallback() {
         let subject = "Сообщение об ошибке".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let body = bugReportBody.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let email = "@mail.ru"
+        let email = "uihelp@mail.ru"
 
         guard let url = URL(string: "mailto:\(email)?subject=\(subject)&body=\(body)"),
               UIApplication.shared.canOpenURL(url) else {
@@ -260,3 +255,8 @@ private enum APIError: LocalizedError {
     }
 }
 
+struct GeneratedMockup: Hashable {
+    let screenTitle: String
+    let screenComment: String
+    let imageURL: URL
+}

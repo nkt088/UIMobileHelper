@@ -72,7 +72,6 @@ enum AppSubcategory: String, CaseIterable, Identifiable, Hashable, Codable {
     case musicPlayer
     case videoHosting
     case streaming
-    case games
     case courses
     case languages
     case lectures
@@ -108,7 +107,7 @@ enum AppSubcategory: String, CaseIterable, Identifiable, Hashable, Codable {
             .finance
         case .messengers, .socialNetworks, .email:
             .communication
-        case .musicPlayer, .videoHosting, .streaming, .games:
+        case .musicPlayer, .videoHosting, .streaming:
             .entertainment
         case .courses, .languages, .lectures, .trainers:
             .education
@@ -297,18 +296,6 @@ enum AppSubcategory: String, CaseIterable, Identifiable, Hashable, Codable {
                 secondaryColor: "#1A2238",
                 accentColor: "#E11D48",
                 screens: ["Главная", "Карточка контента", "Плеер"]
-            )
-
-        case .games:
-            .init(
-                title: "Игры",
-                description: "Игровой сервис с каталогом, достижениями, рейтингами и быстрым запуском игр.",
-                fontName: "Montserrat",
-                fontColor: "#F8FAFC",
-                backgroundColor: "#140F2D",
-                secondaryColor: "#2A1F54",
-                accentColor: "#A855F7",
-                screens: ["Каталог игр", "Карточка игры", "Профиль игрока"]
             )
 
         case .courses:
