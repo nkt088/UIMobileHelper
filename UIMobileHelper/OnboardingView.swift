@@ -70,6 +70,7 @@ struct OnboardingView: View {
                 }
             }
             .tabViewStyle(.page)
+            .indexViewStyle(.page(backgroundDisplayMode: .always))
             Button {
                 if currentPage == pages.count - 1 {
                     finish()
@@ -80,7 +81,7 @@ struct OnboardingView: View {
                 Text(currentPage == pages.count - 1 ? "Начать" : "Далее")
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.white)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .fill(.teal)
