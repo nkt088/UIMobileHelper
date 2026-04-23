@@ -93,7 +93,7 @@ struct OnboardingView: View {
         .toolbar {
             if showsQuestionsButton {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Другие вопросы") {
+                    Button("Задать вопрос") {
                         if MFMailComposeViewController.canSendMail() {
                             showMailComposer = true
                         } else {
