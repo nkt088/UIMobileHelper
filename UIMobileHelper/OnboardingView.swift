@@ -6,13 +6,17 @@
 //
 
 import SwiftUI
+import MessageUI
 
 struct OnboardingView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var isFirstLaunch: Bool
     var showsSkipButton = true
+    var showsQuestionsButton = false
 
     @State private var currentPage = 0
+    @State private var showMailComposer = false
+    @State private var showMailAlert = false
 
     private let pages: [OnboardingPage] = [
         .init(
@@ -85,8 +89,58 @@ struct OnboardingView: View {
             .padding()
         }
         .toolbar(.hidden, for: .tabBar)
+        .toolbar {
+            if showsQuestionsButton {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Другие вопросы") {
+                        if MFMailComposeViewController.canSendMail() {
+                            showMailComposer = true
+                        } else {
+                            openMailFallback()
+                        }
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showMailComposer) {
+            MailComposeView(
+                subject: "Другие вопросы",
+                recipients: ["uihelp@mail.ru"],
+                body: mailBody
+            )
+        }
+        .alert("Не удалось открыть почту", isPresented: $showMailAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("На устройстве не настроено почтовое приложение.")
+        }
     }
 
+    
+    private var mailBody: String {
+        """
+        Здравствуйте.
+        У меня есть вопрос по приложению:
+
+        Устройство: \(UIDevice.current.model)
+        iOS: \(UIDevice.current.systemVersion)
+        """
+    }
+    
+    private func openMailFallback() {
+        let subject = "Другие вопросы".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let body = mailBody.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let email = "uihelp@mail.ru"
+
+        guard let url = URL(string: "mailto:\(email)?subject=\(subject)&body=\(body)"),
+              UIApplication.shared.canOpenURL(url) else {
+            showMailAlert = true
+            return
+        }
+
+        UIApplication.shared.open(url)
+    }
+    
     private func finish() {
         isFirstLaunch = false
         dismiss()

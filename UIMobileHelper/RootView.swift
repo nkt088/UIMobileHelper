@@ -57,7 +57,8 @@ struct MainView: View {
                 NavigationLink("Помощь") {
                     OnboardingView(
                         isFirstLaunch: .constant(false),
-                        showsSkipButton: false
+                        showsSkipButton: false,
+                        showsQuestionsButton: true
                     )
                 }
             }
