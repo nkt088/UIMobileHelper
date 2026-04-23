@@ -80,7 +80,7 @@ struct OnboardingView: View {
                 Text(currentPage == pages.count - 1 ? "Начать" : "Далее")
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .fill(.teal)
