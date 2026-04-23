@@ -33,9 +33,6 @@ struct StudyMaterialView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Полезные материалы")
-                        .font(.title.bold())
-
                     Text("Здесь собраны основные источники по usability, доступности и дизайну интерфейсов. Список можно будет расширять дальше.")
                         .foregroundStyle(.secondary)
                 }
@@ -64,7 +61,7 @@ struct StudyMaterialView: View {
             .padding()
         }
         .navigationTitle("Учебные материалы")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
     }
 }
 
