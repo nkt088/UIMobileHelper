@@ -9,7 +9,7 @@ final class ImageGeneratorVM: ObservableObject {
     @Published var errorMessage: String?
     @Published var progressText = ""
     
-    private let apiKey = ""
+    private let apiKey = "shds-"
     private let createURL = URL(string: "https://gptunnel.ru/v1/media/create")!
     private let resultURL = URL(string: "https://gptunnel.ru/v1/media/result")!
 
@@ -58,7 +58,7 @@ final class ImageGeneratorVM: ObservableObject {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONEncoder().encode(
             CreateRequest(
-                model: "gpt-image-1-medium",
+                model: "gpt-image-1-low",
                 prompt: prompt
             )
         )

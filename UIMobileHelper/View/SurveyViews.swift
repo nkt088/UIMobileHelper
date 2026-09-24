@@ -447,6 +447,7 @@ struct SummaryView: View {
     @Environment(\.dismiss) private var dismiss
     var answers: SurveyAnswers
     var generatedMockups: [GeneratedMockup]
+    @State private var fullscreenURL: URL? = nil
 
     var body: some View {
         ScrollView {
@@ -465,6 +466,16 @@ struct SummaryView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Сохранить") {
                     dismiss()
+                }
+            }
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { fullscreenURL != nil },
+            set: { if !$0 { fullscreenURL = nil } }
+        )) {
+            if let url = fullscreenURL {
+                FullscreenImageView(url: url) {
+                    fullscreenURL = nil
                 }
             }
         }
@@ -566,6 +577,9 @@ struct SummaryView: View {
                                 .foregroundStyle(.secondary)
                         }
                         MockupImageView(url: mockup.imageURL)
+                            .onTapGesture {
+                                fullscreenURL = mockup.imageURL
+                            }
                     }
 
                     if mockup.screenTitle != generatedMockups.last?.screenTitle {
@@ -664,6 +678,58 @@ struct MockupImageView: View {
                 @unknown default:
                     EmptyView()
                 }
+            }
+        }
+    }
+}
+
+struct FullscreenImageView: View {
+    let url: URL
+    let onClose: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+
+            Group {
+                if url.isFileURL, let uiImage = UIImage(contentsOfFile: url.path) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                } else {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView().tint(.white)
+                        case .success(let image):
+                            image.resizable().scaledToFit()
+                        case .failure:
+                            VStack(spacing: 12) {
+                                Image(systemName: "exclamationmark.triangle").foregroundStyle(.white)
+                                Text("Не удалось загрузить изображение").foregroundStyle(.white)
+                            }
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                }
+            }
+            .padding()
+            .contentShape(Rectangle())
+            .onTapGesture { onClose() }
+
+            VStack {
+                HStack {
+                    Spacer()
+                    Button(action: { onClose() }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(.white.opacity(0.95))
+                            .shadow(radius: 2)
+                    }
+                    .padding()
+                }
+                Spacer()
             }
         }
     }
